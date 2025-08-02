@@ -1,0 +1,289 @@
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <link type="text/css" rel="stylesheet" href="bootstrap-vue/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="bootstrap-vue/bootstrap-vue.css" />
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+TC:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans:wght@400;700&display=swap");
+
+        * {
+            font-family: "M PLUS 1p", sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        #app {
+            padding: 0 10px;
+            max-width: 1300px;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        #img_list img {
+            width: 100px;
+            cursor: pointer;
+        }
+
+        .done {
+            opacity: 0.2;
+        }
+
+        #status {
+            display: inline-block;
+            margin: 0 20px 0 0;
+            font-size: 30px;
+        }
+
+        button {
+            margin-bottom: 10px;
+        }
+
+        #clear {
+            margin-left: 30px;
+        }
+
+        #score {
+            width: 85px;
+        }
+
+        #comment {
+            width: 900px;
+            font-size: 30px;
+        }
+    </style>
+
+
+
+    <style>
+        .scroll {
+            font-size: 50px;
+            /* 枠の大きさ */
+            border: solid 1px;
+            /* 枠線 */
+            background-color: #000000;
+            padding: 0;
+            margin: 0;
+            /* 枠線の内側の余白 */
+            overflow: hidden;
+            /* 枠からはみ出た部分を非表示 */
+
+        }
+
+        .scroll p {
+            position: relative;
+            z-index: 1;
+
+            padding: 20px;
+            margin: 0;
+            color: #FFFFFF;
+            /*text-shadow: 0 0 20px;*/
+            padding-left: 100%;
+            /* 右端から文字をスタートさせるため */
+            white-space: nowrap;
+            /* 行間（高さ）を1文字分にする */
+            animation: scroll 15s steps(120) infinite;
+            /* 下のアニメーションを10秒かけて行い、それをくりかえす */
+        }
+
+        /* アニメーション（右から左に移動） */
+        @keyframes scroll {
+            0% {
+                transform: translateX(0)
+            }
+
+            100% {
+                transform: translateX(-270%)
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <h1>{{title}}</h1>
+        <span id="status">全{{imgList.length}}（済{{doneList.length}}／未{{imgList.length-doneList.length}}）
+            でんせつ{{legend}} ハイスコア：<input v-model="score" id="score" type="number" /></span>
+        <b-button @click="counter(20)">ｳﾃﾞﾏｴ+20</b-button>
+        <b-button @click="counter(-10)">ｳﾃﾞﾏｴ-10</b-button>
+        <b-button @click="counter(-20)">ｳﾃﾞﾏｴ-20</b-button>
+        <b-button @click="counter(-5)">ｳﾃﾞﾏｴ-5</b-button>
+        <b-button id="clear" @click="clear()">クリア</b-button>
+        <div id="img_list">
+            <span v-for="img in imgList">
+                <img :src="img.src" :title="img.alt" :class="doneList.indexOf(img.src) > -1 ? 'done' :''"
+                    @click="done(img.src)" />
+            </span>
+        </div>
+        <br />
+        <input v-model="comment" id="comment" />
+        <br />
+        <br />
+
+        <div class="scroll">
+            <p>
+                {{comment}}　
+                全{{imgList.length}}（済{{doneList.length}}／未{{imgList.length-doneList.length}}）　でんせつ{{legend}}　ハイスコア：{{score}}
+            </p>
+        </div>
+        </input<>
+
+        <script src="bootstrap-vue/vue.min.js"></script>
+        <script src="bootstrap-vue/bootstrap-vue.min.js"></script>
+        <script src="bootstrap-vue/bootstrap-vue-icons.min.js"></script>
+
+        <script>
+            const vue = new Vue({
+                el: "#app",
+                data() {
+                    return {
+                        title: "バイト武器一覧",
+                        imgList: [
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we1.png', alt: 'わかばシューター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we2.png', alt: 'スプラシューター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we12.png', alt: 'プロモデラーMG' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we18.png', alt: 'N-ZAP85' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we143.png', alt: 'スペースシューター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we21.png', alt: 'プライムシューター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we20.png', alt: 'ボールドマーカー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we36.png', alt: '52ガロン' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we54.png', alt: 'L3リールガン' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we51.png', alt: 'ジェットスイーパー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we90.png', alt: 'シャープマーカー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we69.png', alt: '96ガロン' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we44.png', alt: 'ボトルガイザー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we115.png', alt: 'H3リールガン' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we4.png', alt: 'スプラローラー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we13.png', alt: 'カーボンローラー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we65.png', alt: 'ダイナモローラー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we144.png', alt: 'ワイドローラー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we84.png', alt: 'ヴァリアブルローラー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we3.png', alt: 'スプラチャージャー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we30.png', alt: 'スクイックリンα' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we145.png', alt: 'R-PEN/5H' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we64.png', alt: 'リッター4K' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we56.png', alt: '14式竹筒銃・甲' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we74.png', alt: 'ソイチューバー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we9.png', alt: 'バケットスロッシャー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we40.png', alt: 'ヒッセン' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we34.png', alt: 'スクリュースロッシャー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we151.png', alt: 'モップリン' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we26.png', alt: 'オーバーフロッシャー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we57.png', alt: 'エクスプロッシャー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we16.png', alt: 'バレルスピナー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we80.png', alt: 'スプラスピナー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we152.png', alt: 'イグザミナー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we106.png', alt: 'ハイドラント' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we100.png', alt: 'ノーチラス47' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we94.png', alt: 'クーゲルシュライバー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we7.png', alt: 'スプラマニューバー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we28.png', alt: 'デュアルスイーパー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we98.png', alt: 'スパッタリー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we37.png', alt: 'クアッドホッパーブラック' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we52.png', alt: 'ケルビン525' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we164.png', alt: 'ガエンFF' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we19.png', alt: 'パラシェルター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we81.png', alt: 'キャンピングシェルター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we32.png', alt: 'スパイガジェット' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we163.png', alt: '24式張替傘・甲' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we8.png', alt: 'ホットブラスター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we33.png', alt: 'ラピッドブラスター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we35.png', alt: 'ロングブラスター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we58.png', alt: 'ノヴァブラスター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we147.png', alt: 'S-BLAST92' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we122.png', alt: 'クラッシュブラスター' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we76.png', alt: 'Rブラスターエリート' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we23.png', alt: 'ホクサイ' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we10.png', alt: 'パブロ' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we146.png', alt: 'フィンセント' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we140.png', alt: 'トライストリンガー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we139.png', alt: 'LACT450' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we178.png', alt: 'フルイドV' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we141.png', alt: 'ドライブワイパー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we142.png', alt: 'ジムワイパー' },
+                            { src: 'https://img.gamewith.jp/article_tools/splatoon3/gacha/we180.png', alt: 'デンタルワイパーミント' },
+                        ],
+                        doneList: [],
+                        legend: 40,
+                        score: 20,
+                        comment: 'test'
+                    }
+
+                },
+                watch: {
+                    score: () => {
+                        localStorage.setItem("score", vue.score)
+                        console.log(1)
+                    },
+                    comment: () => {
+                        localStorage.setItem("comment", vue.comment)
+                        console.log(2)
+                    }
+                },
+                methods: {
+                    done(src) {
+                        let index = this.doneList.indexOf(src)
+                        if (index == -1) {
+                            this.doneList.push(src)
+                            localStorage.setItem(src, "1");
+                        } else {
+                            this.doneList.splice(index, 1)
+                            localStorage.setItem(src, "0");
+                        }
+
+                    },
+                    counter(num) {
+                        this.legend = this.legend + num
+                        if (this.legend > 999) {
+                            this.legend = 999
+                        } else if (this.legend < 0) {
+                            this.legend = 0
+                        }
+                        localStorage.setItem("legend", this.legend);
+
+                    },
+                    clear() {
+                        this.doneList.splice(0)
+                        this.legend = 40
+                        localStorage.clear()
+                    }
+                },
+                created() {
+                    this.imgList.forEach(dt => {
+                        if (localStorage.getItem(dt.src) == '1') {
+                            this.doneList.push(dt.src)
+                        }
+                        if (localStorage.getItem("legend") !== null) {
+                            this.legend = parseInt(localStorage.getItem("legend"))
+                        }
+                        if (localStorage.getItem("score") !== null) {
+                            this.score = parseInt(localStorage.getItem("score"))
+                        }
+                        if (localStorage.getItem("comment") !== null) {
+                            this.comment = localStorage.getItem("comment")
+                        }
+                    })
+                },
+                mounted() {
+
+                }
+
+            })
+
+
+
+        </script>
